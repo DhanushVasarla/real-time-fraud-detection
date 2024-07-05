@@ -2,6 +2,7 @@ from kafka import KafkaProducer
 from kafka.errors import KafkaError
 import socket
 import time
+import random
 from aws_msk_iam_sasl_signer import MSKAuthTokenProvider
 
 class MSKTokenProvider():
@@ -12,7 +13,7 @@ class MSKTokenProvider():
 tp = MSKTokenProvider()
 
 producer = KafkaProducer(
-    bootstrap_servers='b-1.kafka.1es57u.c3.kafka.ap-south-1.amazonaws.com:9098,b-2.kafka.1es57u.c3.kafka.ap-south-1.amazonaws.com:9098',
+    bootstrap_servers='b-2.kafka.16gabb.c3.kafka.ap-south-1.amazonaws.com:9098',
     security_protocol='SASL_SSL',
     sasl_mechanism='OAUTHBEARER',
     sasl_oauth_token_provider=tp,
@@ -20,14 +21,28 @@ producer = KafkaProducer(
 )
 
 topic = "kafka-topic"
-msg = "[57.87785658389723,0.3111400080477545,1.9459399775518593,1.0,1.0,0.0,0.0,0.0]"
+
+def generate_random_message():
+    return [
+        random.uniform(0, 1000),  
+        random.uniform(0, 1000),
+        random.uniform(0, 1000),
+        random.uniform(0, 1),    
+        random.uniform(0, 1),
+        random.choice([0, 1]),   
+        random.choice([0, 1]),
+        random.choice([0, 1])
+    ]
+
+
 while True:
     try:
+        msg = generate_random_message()
         inp=str(msg)
         producer.send(topic, inp.encode())
         producer.flush()
-        print("Produced!")
-        time.sleep(2)
+        print(f"Produced: {inp}")
+        time.sleep(1)
         # ctr+=1
     except Exception:
         print("Failed to send message:", e)

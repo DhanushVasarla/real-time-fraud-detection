@@ -10,31 +10,16 @@ from imblearn.over_sampling import SMOTE
 from xgboost import XGBClassifier
 import os
 import sys
+from CustomTransformers import FeatureAdder
 
 sys.path
 
 cwd = os.getcwd()
 
 
-dataset_path = os.path.join(cwd,'src','input','card_transdata.csv')
+dataset_path = os.path.join(cwd,'input','card_transdata.csv')
 df = pd.read_csv(dataset_path)
 df.head()
-
-from sklearn.base import BaseEstimator, TransformerMixin
-
-class FeatureAdder(BaseEstimator, TransformerMixin):
-    def __init__(self, add_columns=None, new_col =None ):
-        self.add_columns = add_columns
-        self.new_col = new_col
-    
-    def fit(self, X, y=None):
-        return self
-    
-    def transform(self, X):
-        X_new = X.copy()
-        col1,col2 = self.add_columns
-        X_new[self.new_col] = X_new[col1] + X_new[col2]
-        return X_new
     
 fe = FeatureAdder(add_columns=['distance_from_home', 'distance_from_last_transaction'],new_col = 'distance_sum')
 df = fe.transform(df)
@@ -88,9 +73,9 @@ pipeline.fit(X_train,y_train)
 
 import pickle
 
-models_folder = os.path.join(cwd,'src', 'models')
+models_folder = os.path.join(cwd, 'models')
 
-pipeline_path = os.path.join(models_folder, 'pipeline.pkl')
+pipeline_path = os.path.join(models_folder, 'new_pipeline.pkl')
 
 with open(pipeline_path, 'wb') as f:
     pickle.dump(pipeline, f)

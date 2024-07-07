@@ -13,14 +13,14 @@ class MSKTokenProvider():
 tp = MSKTokenProvider()
 
 producer = KafkaProducer(
-    bootstrap_servers='b-2.kafka.16gabb.c3.kafka.ap-south-1.amazonaws.com:9098',
+    bootstrap_servers='b-1.kafka.xy5s1w.c3.kafka.ap-south-1.amazonaws.com:9098',
     security_protocol='SASL_SSL',
     sasl_mechanism='OAUTHBEARER',
     sasl_oauth_token_provider=tp,
     client_id=socket.gethostname(),
 )
 
-topic = "kafka-topic"
+topic = "kafka-topic-2"
 
 def generate_random_message():
     return [
@@ -42,8 +42,7 @@ while True:
         producer.send(topic, inp.encode())
         producer.flush()
         print(f"Produced: {inp}")
-        time.sleep(1)
-        # ctr+=1
+        time.sleep(0)
     except Exception:
         print("Failed to send message:", e)
 

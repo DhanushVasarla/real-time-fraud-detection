@@ -10,11 +10,12 @@ import pandas as pd
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from CustomTransformers import FeatureAdder
+from mail import send_email
 
 # sys.path.append(os.path.abspath('..','train.py'))
 pipeline_path =  os.path.join('..','models','new_pipeline.pkl')
 
-with open(pipeline_path, 'rb') as f:
+with open(pipeline_path, 'rb') as f:   
     loaded_pipeline = pickle.load(f)
 
 cols = ["distance_from_home","distance_from_last_transaction","ratio_to_median_purchase_price","repeat_retailer","used_chip","used_pin_number","online_order"]
@@ -31,7 +32,7 @@ def oauth_cb(oauth_config):
 
 c = Consumer({
     
-    'bootstrap.servers': "b-2.kafka.16gabb.c3.kafka.ap-south-1.amazonaws.com:9098",
+    'bootstrap.servers': "b-1.kafka.xy5s1w.c3.kafka.ap-south-1.amazonaws.com:9098",
     'client.id': socket.gethostname(),
     'security.protocol': 'SASL_SSL',
     'sasl.mechanisms': 'OAUTHBEARER',
@@ -40,7 +41,7 @@ c = Consumer({
     'auto.offset.reset': 'earliest'
 })
 
-c.subscribe(['kafka-topic'])
+c.subscribe(['kafka-topic-2'])
 
 print("Starting consumer!")
 
@@ -59,12 +60,23 @@ while True:
     prediction = make_inference_single_record(message_list)
     print(prediction)
 
-    if prediction == 0:
-        print("Not Fraud")
-    else:
+    if prediction == 1:
         print("Detected Fraud!")
-    # print(f"Received: {message_dict}")
+        sender_email = "dhanushvasarla@gmail.com"
+        receiver_email = "dhanushvasarla@gmail.com" 
+        password = "tcem ieri wjwk isps" 
+        subject = "Fraud Detected Alert"
+        body = "Fraudulent activity detected. Please investigate immediately."
+    
+        send_email(sender_email, receiver_email, password, subject, body, message_list)
+    else:
+         print("Not Fraud")
+        
+    # print(f"Received: {message_list}")
     # print(type(message_dict))
+   
+    
+    
 
 
 c.close()
